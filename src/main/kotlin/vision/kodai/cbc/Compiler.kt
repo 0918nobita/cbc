@@ -5,7 +5,7 @@ import kotlin.system.exitProcess
 
 object Compiler {
     private const val PROGRAM_NAME = "cbc"
-    // private const val VERSION = "1.0.0"
+    private const val VERSION = "1.0.0"
 
     private val errorHandler = ErrorHandler(PROGRAM_NAME)
 
@@ -14,8 +14,21 @@ object Compiler {
         return true
     }
 
-    private fun compile(@Suppress("UNUSED_PARAMETER") src: SourceFile): Result<Unit, CompileError> {
+    private fun parseFile(@Suppress("UNUSED_PARAMETER") src: SourceFile): Ast {
         // TODO: porting
+        return Ast(
+            Location(
+                "example",
+                CflatToken(0, 0, 0, 0, "")
+            ),
+            Decls()
+        )
+    }
+
+    private fun compile(src: SourceFile): Result<Unit, CompileError> {
+        // TODO: porting
+        @Suppress("UNUSED_VARIABLE")
+        val ast = parseFile(src)
         return Ok(Unit)
     }
 
