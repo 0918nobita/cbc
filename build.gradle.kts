@@ -10,3 +10,7 @@ application {
 repositories {
     mavenCentral()
 }
+
+dependencies {
+    implementation("com.michael-bull.kotlin-result:kotlin-result:1.1.12")
+}
