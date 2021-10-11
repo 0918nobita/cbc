@@ -1,4 +1,4 @@
-package vision.kodai.cbc
+package vision.kodai.cbc.ast
 
 // TODO: porting
 

@@ -7,7 +7,9 @@ object Options {
     var mode: CompilerMode = CompilerMode.Initial
     var sourceFiles: List<SourceFile> = emptyList()
 
-    fun parse(args: Array<String>): Result<Unit, OptionParseError> {
+    fun parse(
+        @Suppress("UNUSED_PARAMETER") args: Array<String>
+    ): Result<Unit, OptionParseError> {
         // TODO: porting
         return Ok(Unit)
     }

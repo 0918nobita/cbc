@@ -1,6 +1,8 @@
 package vision.kodai.cbc
 
 import com.github.michaelbull.result.*
+import vision.kodai.cbc.ast.Ast
+import vision.kodai.cbc.ast.Decls
 import kotlin.system.exitProcess
 
 object Compiler {
