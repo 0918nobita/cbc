@@ -30,4 +30,16 @@ data class Decls(
     val unionDefs: Set<UnionDef> = emptySet(),
 
     val typeAliasDefs: Set<TypeAliasDef> = emptySet()
-)
+) {
+    operator fun plus(newDecls: Decls) =
+        Decls(
+            varDefs + newDecls.varDefs,
+            varDecls + newDecls.varDecls,
+            funcDefs + newDecls.funcDefs,
+            funcDecls + newDecls.funcDecls,
+            constDefs + newDecls.constDefs,
+            structDefs + newDecls.structDefs,
+            unionDefs + newDecls.unionDefs,
+            typeAliasDefs + newDecls.typeAliasDefs
+        )
+}
