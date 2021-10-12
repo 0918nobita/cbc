@@ -1,7 +1,8 @@
-package vision.kodai.cbc.ast
+package vision.kodai.cbc.ast.node
 
 import vision.kodai.cbc.Dumper
 import vision.kodai.cbc.Location
+import vision.kodai.cbc.ast.VarDef
 
 sealed interface BlockMember {
     data class VarDefsInBlock(val varDef: VarDef) : BlockMember

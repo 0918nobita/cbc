@@ -1,4 +1,4 @@
-package vision.kodai.cbc.ast
+package vision.kodai.cbc.ast.node
 
 import vision.kodai.cbc.Dumpable
 import vision.kodai.cbc.Location
@@ -7,13 +7,11 @@ import vision.kodai.cbc.Location
 sealed interface Node : Dumpable {
     val location: Location
 
-    // TODO: porting
     sealed interface Stmt : Node {
         sealed interface Block : Stmt
         sealed interface If : Stmt
     }
 
-    // TODO: porting
     sealed interface Expr : Node {
         sealed interface Funcall : Expr
     }

@@ -27,10 +27,15 @@ object Compiler {
         )
     }
 
+    @Suppress("UNUSED_VARIABLE")
     private fun compile(src: SourceFile): Result<Unit, CompileError> {
         // TODO: porting
-        @Suppress("UNUSED_VARIABLE")
         val ast = parseFile(src)
+        val typeSpec = Options.platform.typeSpec
+        // semanticAnalyze()
+        // IR generation
+        // Assembly generation
+        // writeFile()
         return Ok(Unit)
     }
 

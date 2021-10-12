@@ -1,4 +1,4 @@
-package vision.kodai.cbc.ast
+package vision.kodai.cbc.ast.node
 
 import vision.kodai.cbc.Dumper
 
