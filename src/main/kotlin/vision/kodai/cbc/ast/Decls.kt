@@ -1,8 +1,16 @@
 package vision.kodai.cbc.ast
 
+import vision.kodai.cbc.Dumpable
+import vision.kodai.cbc.Dumper
+
+class VarDef : Dumpable {
+    override fun dump(dumper: Dumper) {
+        // TODO: porting
+    }
+}
+
 // TODO: porting
 
-class VarDef
 class VarDecl
 
 class FuncDef

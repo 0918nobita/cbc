@@ -9,6 +9,7 @@ sealed interface Node : Dumpable {
 
     // TODO: porting
     sealed interface Stmt : Node {
+        sealed interface Block : Stmt
         sealed interface If : Stmt
     }
 
