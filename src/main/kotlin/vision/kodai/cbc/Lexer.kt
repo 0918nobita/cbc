@@ -1,8 +1,10 @@
 package vision.kodai.cbc
 
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.fold
 import vision.kodai.cbc.token.IntToken
-import java.io.BufferedReader
+import vision.kodai.cbc.token.Token
 
 /** 単項演算子 */
 enum class UnaryOp { PLUS, MINUS }
@@ -47,13 +49,8 @@ private fun reducer(pair: Pair<LexerState, Int>, c: Char): Pair<LexerState, Int>
 }
 
 /** 字句解析を行う */
-fun lex(reader: BufferedReader) = flow {
-    val (state, numChars) =
-        reader
-            .lineSequence()
-            .flatMap { it.toList() }
-            .runningFold(Pair(LexerState.Initial, -1), ::reducer)
-            .last()
+fun Flow<Char>.lex(): Flow<Token> = flow {
+    val (state, numChars) = fold(Pair(LexerState.Initial, -1), ::reducer)
 
     when (state) {
         is LexerState.CanReceiveAdditionalDigit -> {
