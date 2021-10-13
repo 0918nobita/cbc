@@ -14,4 +14,5 @@ repositories {
 
 dependencies {
     implementation("com.michael-bull.kotlin-result:kotlin-result:1.1.12")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.5.2")
 }

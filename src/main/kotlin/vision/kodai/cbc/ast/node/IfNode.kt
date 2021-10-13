@@ -8,7 +8,7 @@ data class IfNode(
     val cond: Node.Expr,
     val thenClause: Node.Stmt,
     val elseClause: Node.Stmt
-) : Node.Stmt.If {
+) : Node.Stmt {
     override fun dump(dumper: Dumper) {
         dumper.printMember("cond", cond)
         dumper.printMember("thenClause", thenClause)

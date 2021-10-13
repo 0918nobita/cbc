@@ -7,12 +7,7 @@ import vision.kodai.cbc.Location
 sealed interface Node : Dumpable {
     val location: Location
 
-    sealed interface Stmt : Node {
-        sealed interface Block : Stmt
-        sealed interface If : Stmt
-    }
+    sealed interface Stmt : Node
 
-    sealed interface Expr : Node {
-        sealed interface Funcall : Expr
-    }
+    sealed interface Expr : Node
 }

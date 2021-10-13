@@ -5,7 +5,7 @@ import vision.kodai.cbc.Dumper
 data class FuncallNode(
     val expr: Node.Expr,
     val args: List<Node.Expr>
-) : Node.Expr.Funcall {
+) : Node.Expr {
     override val location = expr.location
 
     override fun dump(dumper: Dumper) {

@@ -3,6 +3,7 @@ package vision.kodai.cbc
 import com.github.michaelbull.result.*
 import vision.kodai.cbc.ast.Ast
 import vision.kodai.cbc.ast.Decls
+import vision.kodai.cbc.token.IntToken
 import kotlin.system.exitProcess
 
 object Compiler {
@@ -21,7 +22,7 @@ object Compiler {
         return Ast(
             Location(
                 "example",
-                CflatToken(0, 0, 0, 0, "")
+                IntToken(Point(0, 0), Point(0, 1), 42)
             ),
             Decls()
         )

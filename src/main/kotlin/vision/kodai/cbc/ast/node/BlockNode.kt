@@ -12,7 +12,7 @@ sealed interface BlockMember {
 data class BlockNode(
     override val location: Location,
     val members: List<BlockMember>
-) : Node.Stmt.Block {
+) : Node.Stmt {
     override fun dump(dumper: Dumper) {
         members.map {
             when (it) {
