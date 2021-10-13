@@ -10,13 +10,13 @@ import kotlin.system.exitProcess
 fun main(args: Array<String>) {
     Compiler.main(args)
 
-    val lexer = Lexer(BufferedReader(StringReader("-42")))
     runBlocking {
-        lexer.tokens.catch {
-            System.err.println(it.message)
-            exitProcess(1)
-        }.collect {
-            println(it)
-        }
+        lex(BufferedReader(StringReader("-42")))
+            .catch {
+                System.err.println(it.message)
+                exitProcess(1)
+            }.collect {
+                println(it)
+            }
     }
 }
