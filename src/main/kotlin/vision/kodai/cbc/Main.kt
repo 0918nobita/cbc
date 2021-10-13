@@ -9,16 +9,15 @@ import kotlin.system.exitProcess
 fun main(args: Array<String>) {
     Compiler.main(args)
 
+    val src = "3 7\n    21\n"
+    val tokens = src.toList().asFlow().lex()
+
     runBlocking {
-        "42"
-            .asSequence()
-            .asFlow()
-            .lex()
-            .catch {
-                System.err.println(it.message)
-                exitProcess(1)
-            }.collect {
-                println(it)
-            }
+        tokens.catch {
+            System.err.println(it.message)
+            exitProcess(1)
+        }.collect {
+            println(it)
+        }
     }
 }

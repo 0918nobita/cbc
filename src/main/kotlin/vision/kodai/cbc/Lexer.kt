@@ -12,38 +12,49 @@ sealed interface LexerState {
     object Initial : LexerState
 
     /** すでに1つ以上数字を読み取っており、追加で数字を読み取れる状態 */
-    data class CanReceiveAdditionalDigit(val digits: String) : LexerState
+    data class CanReceiveAdditionalDigit(
+        val begin: Point,
+        val end: Point,
+        val digits: String
+    ) : LexerState
 }
 
 /** 字句解析の失敗 */
 class LexerException(msg: String) : Exception(msg)
 
-private fun reducer(pair: Pair<LexerState, Int>, c: Char): Pair<LexerState, Int> {
-    val (prevState, numChars) = pair
-    val state = when (prevState) {
-        is LexerState.Initial -> when {
-            c.isDigit() -> LexerState.CanReceiveAdditionalDigit(c.toString())
-            else -> throw LexerException("Expected digit")
-        }
-        is LexerState.CanReceiveAdditionalDigit -> when {
-            c.isDigit() -> LexerState.CanReceiveAdditionalDigit(prevState.digits + c)
-            else -> throw LexerException("Expected digit")
-        }
-    }
-    return Pair(state, numChars + 1)
-}
-
 /** 字句解析を行う */
 fun Flow<Char>.lex(): Flow<Token> = flow {
-    val (state, numChars) = fold(Pair(LexerState.Initial, -1), ::reducer)
+    var point = Point(0, 0)
 
-    when (state) {
-        is LexerState.CanReceiveAdditionalDigit -> {
-            val begin = Point(0, 0)
-            val end = Point(0, numChars)
-            val intVal = state.digits.toInt()
-            emit(IntToken(begin, end, intVal))
+    val finalState = fold<Char, LexerState>(LexerState.Initial) { prevState, c ->
+        val state = when (prevState) {
+            is LexerState.Initial -> when {
+                c.isDigit() -> LexerState.CanReceiveAdditionalDigit(point, point, c.toString())
+                c.isWhitespace() -> LexerState.Initial
+                else -> throw LexerException("Expected digit or whitespace")
+            }
+            is LexerState.CanReceiveAdditionalDigit -> when {
+                c.isDigit() -> LexerState.CanReceiveAdditionalDigit(prevState.begin, point, prevState.digits + c)
+                c.isWhitespace() -> {
+                    emit(IntToken(prevState.begin, prevState.end, prevState.digits.toInt()))
+                    LexerState.Initial
+                }
+                else -> throw LexerException("Expected digit or whitespace")
+            }
         }
-        else -> throw LexerException("Non-accepting state")
+
+        point = if (c == '\n') {
+            Point(point.line + 1, 0)
+        } else {
+            Point(point.line, point.column + 1)
+        }
+
+        state
+    }
+
+    when (finalState) {
+        is LexerState.Initial -> {}
+        is LexerState.CanReceiveAdditionalDigit ->
+            emit(IntToken(finalState.begin, finalState.end, finalState.digits.toInt()))
     }
 }
