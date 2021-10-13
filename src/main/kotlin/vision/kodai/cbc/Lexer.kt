@@ -25,31 +25,34 @@ sealed interface LexerState {
 /** 字句解析の失敗 */
 class LexerException(msg: String) : Exception(msg)
 
+private fun reducer(pair: Pair<LexerState, Int>, c: Char): Pair<LexerState, Int> {
+    val (prevState, numChars) = pair
+    val state = when (prevState) {
+        is LexerState.Initial -> when {
+            c == '+' -> LexerState.ShouldReceiveDigit(UnaryOp.PLUS)
+            c == '-' -> LexerState.ShouldReceiveDigit(UnaryOp.MINUS)
+            c.isDigit() -> LexerState.CanReceiveAdditionalDigit(UnaryOp.PLUS, c.toString())
+            else -> throw LexerException("Expected +, - or digit")
+        }
+        is LexerState.ShouldReceiveDigit -> when {
+            c.isDigit() -> LexerState.CanReceiveAdditionalDigit(prevState.unaryOp, c.toString())
+            else -> throw LexerException("Expected digit")
+        }
+        is LexerState.CanReceiveAdditionalDigit -> when {
+            c.isDigit() -> LexerState.CanReceiveAdditionalDigit(prevState.unaryOp, prevState.digits + c)
+            else -> throw LexerException("Expected digit")
+        }
+    }
+    return Pair(state, numChars + 1)
+}
+
 /** 字句解析を行う */
 fun lex(reader: BufferedReader) = flow {
     val (state, numChars) =
         reader
             .lineSequence()
             .flatMap { it.toList() }
-            .runningFold<Char, Pair<LexerState, Int>>(Pair(LexerState.Initial, -1)) { (prevState, numChars), c ->
-                val state = when (prevState) {
-                    is LexerState.Initial -> when {
-                        c == '+' -> LexerState.ShouldReceiveDigit(UnaryOp.PLUS)
-                        c == '-' -> LexerState.ShouldReceiveDigit(UnaryOp.MINUS)
-                        c.isDigit() -> LexerState.CanReceiveAdditionalDigit(UnaryOp.PLUS, c.toString())
-                        else -> throw LexerException("Expected +, - or digit")
-                    }
-                    is LexerState.ShouldReceiveDigit -> when {
-                        c.isDigit() -> LexerState.CanReceiveAdditionalDigit(prevState.unaryOp, c.toString())
-                        else -> throw LexerException("Expected digit")
-                    }
-                    is LexerState.CanReceiveAdditionalDigit -> when {
-                        c.isDigit() -> LexerState.CanReceiveAdditionalDigit(prevState.unaryOp, prevState.digits + c)
-                        else -> throw LexerException("Expected digit")
-                    }
-                }
-                Pair(state, numChars + 1)
-            }
+            .runningFold(Pair(LexerState.Initial, -1), ::reducer)
             .last()
 
     when (state) {
