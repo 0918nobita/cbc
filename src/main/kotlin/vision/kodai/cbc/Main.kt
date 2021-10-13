@@ -10,7 +10,7 @@ fun main(args: Array<String>) {
     Compiler.main(args)
 
     runBlocking {
-        "-42"
+        "42"
             .asSequence()
             .asFlow()
             .lex()
