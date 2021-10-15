@@ -4,6 +4,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.fold
 import vision.kodai.cbc.token.IntToken
+import vision.kodai.cbc.token.PlusToken
 import vision.kodai.cbc.token.Token
 
 /** 字句解析器の状態 */
@@ -31,6 +32,10 @@ fun Flow<Char>.lex(): Flow<Token> = flow {
             is LexerState.Initial -> when {
                 c.isDigit() -> LexerState.CanReceiveAdditionalDigit(point, point, c.toString())
                 c.isWhitespace() -> LexerState.Initial
+                c == '+' -> {
+                    emit(PlusToken(point, point))
+                    LexerState.Initial
+                }
                 else -> throw LexerException("Expected digit or whitespace")
             }
             is LexerState.CanReceiveAdditionalDigit -> when {

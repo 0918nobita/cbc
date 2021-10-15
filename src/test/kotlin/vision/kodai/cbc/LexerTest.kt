@@ -5,18 +5,18 @@ import io.kotest.matchers.shouldBe
 import kotlinx.coroutines.flow.asFlow
 import kotlinx.coroutines.flow.toList
 import vision.kodai.cbc.token.IntToken
+import vision.kodai.cbc.token.PlusToken
 
 class LexerTest : StringSpec({
     "tokenization" {
-        val src = "3 7\n    21\n"
+        val src = "3 + 7"
         val tokenFlow = src.toList().asFlow().lex()
         val expected =
             listOf(
                 IntToken(Point(0, 0), Point(0, 0), 3),
-                IntToken(Point(0, 2), Point(0, 2), 7),
-                IntToken(Point(1, 4), Point(1, 5), 21)
+                PlusToken(Point(0, 2), Point(0, 2)),
+                IntToken(Point(0, 4), Point(0, 4), 7)
             )
-        val tokens = tokenFlow.toList()
-        expected shouldBe tokens
+        tokenFlow.toList() shouldBe expected
     }
 })
