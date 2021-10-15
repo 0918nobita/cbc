@@ -2,7 +2,6 @@ package vision.kodai.cbc
 
 import com.github.michaelbull.result.Ok
 import com.github.michaelbull.result.Result
-import vision.kodai.cbc.platform.Platform
 
 object Options {
     val platform = Platform.X64

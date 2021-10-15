@@ -1,6 +1,4 @@
-package vision.kodai.cbc.platform
-
-import vision.kodai.cbc.TypeSpec
+package vision.kodai.cbc
 
 sealed interface Platform {
     val typeSpec : TypeSpec

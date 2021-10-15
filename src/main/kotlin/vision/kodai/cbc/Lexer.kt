@@ -3,9 +3,6 @@ package vision.kodai.cbc
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.fold
-import vision.kodai.cbc.token.IntToken
-import vision.kodai.cbc.token.PlusToken
-import vision.kodai.cbc.token.Token
 
 /** 字句解析器の状態 */
 sealed interface LexerState {
@@ -33,7 +30,7 @@ fun Flow<Char>.lex(): Flow<Token> = flow {
                 c.isDigit() -> LexerState.CanReceiveAdditionalDigit(point, point, c.toString())
                 c.isWhitespace() -> LexerState.Initial
                 c == '+' -> {
-                    emit(PlusToken(point, point))
+                    emit(Token.Plus(point, point))
                     LexerState.Initial
                 }
                 else -> throw LexerException("Expected digit or whitespace")
@@ -41,7 +38,7 @@ fun Flow<Char>.lex(): Flow<Token> = flow {
             is LexerState.CanReceiveAdditionalDigit -> when {
                 c.isDigit() -> LexerState.CanReceiveAdditionalDigit(prevState.begin, point, prevState.digits + c)
                 c.isWhitespace() -> {
-                    emit(IntToken(prevState.begin, prevState.end, prevState.digits.toInt()))
+                    emit(Token.IntToken(prevState.begin, prevState.end, prevState.digits.toInt()))
                     LexerState.Initial
                 }
                 else -> throw LexerException("Expected digit or whitespace")
@@ -60,6 +57,6 @@ fun Flow<Char>.lex(): Flow<Token> = flow {
     when (finalState) {
         is LexerState.Initial -> {}
         is LexerState.CanReceiveAdditionalDigit ->
-            emit(IntToken(finalState.begin, finalState.end, finalState.digits.toInt()))
+            emit(Token.IntToken(finalState.begin, finalState.end, finalState.digits.toInt()))
     }
 }
