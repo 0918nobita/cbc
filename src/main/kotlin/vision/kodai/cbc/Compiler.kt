@@ -5,6 +5,13 @@ import vision.kodai.cbc.ast.Ast
 import vision.kodai.cbc.ast.Decls
 import kotlin.system.exitProcess
 
+enum class CompilerMode {
+    Initial,
+    CheckSyntax
+}
+
+data class CompileError(val msg: String)
+
 object Compiler {
     private const val PROGRAM_NAME = "cbc"
     private const val VERSION = "1.0.0"
@@ -21,7 +28,7 @@ object Compiler {
         return Ast(
             Location(
                 "example",
-                Token.IntToken(Point(0, 0), Point(0, 1), 42)
+                Token.IntToken(42, Point(0, 0), Point(0, 1))
             ),
             Decls()
         )

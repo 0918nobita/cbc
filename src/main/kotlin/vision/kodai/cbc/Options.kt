@@ -3,6 +3,8 @@ package vision.kodai.cbc
 import com.github.michaelbull.result.Ok
 import com.github.michaelbull.result.Result
 
+data class OptionParseError(val msg: String)
+
 object Options {
     val platform = Platform.X64
 

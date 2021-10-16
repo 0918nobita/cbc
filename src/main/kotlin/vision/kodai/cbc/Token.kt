@@ -5,9 +5,9 @@ sealed interface Token {
     val end: Point
 
     data class IntToken(
+        val raw: Int,
         override val begin: Point,
-        override val end: Point,
-        val raw: Int
+        override val end: Point
     ) : Token
 
     data class Plus(

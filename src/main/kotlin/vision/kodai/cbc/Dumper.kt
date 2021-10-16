@@ -1,5 +1,9 @@
 package vision.kodai.cbc
 
+interface Dumpable {
+    fun dump(dumper: Dumper)
+}
+
 class Dumper {
     @Suppress("UNUSED_PARAMETER")
     fun printMember(name: String, member: Dumpable) {

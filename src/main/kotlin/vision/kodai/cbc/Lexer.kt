@@ -21,6 +21,7 @@ sealed interface LexerState {
 class LexerException(msg: String) : Exception(msg)
 
 /** 字句解析を行う */
+@Throws(LexerException::class)
 fun Flow<Char>.lex(): Flow<Token> = flow {
     var point = Point(0, 0)
 
@@ -38,7 +39,7 @@ fun Flow<Char>.lex(): Flow<Token> = flow {
             is LexerState.CanReceiveAdditionalDigit -> when {
                 c.isDigit() -> LexerState.CanReceiveAdditionalDigit(prevState.begin, point, prevState.digits + c)
                 c.isWhitespace() -> {
-                    emit(Token.IntToken(prevState.begin, prevState.end, prevState.digits.toInt()))
+                    emit(Token.IntToken(prevState.digits.toInt(), prevState.begin, prevState.end))
                     LexerState.Initial
                 }
                 else -> throw LexerException("Expected digit or whitespace")
@@ -55,8 +56,9 @@ fun Flow<Char>.lex(): Flow<Token> = flow {
     }
 
     when (finalState) {
-        is LexerState.Initial -> {}
+        is LexerState.Initial -> {
+        }
         is LexerState.CanReceiveAdditionalDigit ->
-            emit(Token.IntToken(finalState.begin, finalState.end, finalState.digits.toInt()))
+            emit(Token.IntToken(finalState.digits.toInt(), finalState.begin, finalState.end))
     }
 }
