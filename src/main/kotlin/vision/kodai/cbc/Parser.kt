@@ -23,26 +23,28 @@ suspend fun Flow<Token>.parse(): Entity.Expr<Int> {
     return expr
 }
 
+suspend fun <T> Flow<T>.firstAndTail(): Pair<T, Flow<T>> = Pair(first(), drop(1))
+
 /** 式のパーサ */
 @Throws(ParseException::class)
 suspend fun Flow<Token>.expr(): Pair<Entity.Expr<Int>, Flow<Token>> {
     val (lhs, rem1) = intLiteral()
     if (rem1.count() == 0) return Pair(lhs, rem1)
 
-    val op = rem1.first()
+    val (op, rem2) = rem1.firstAndTail()
     if (op !is Token.Plus)
         throw ParseException(ParseExnReason.UnexpectedToken("+", op))
 
-    val (rhs, rem2) = rem1.drop(1).intLiteral()
+    val (rhs, rem3) = rem2.intLiteral()
 
-    return Pair(Entity.Expr.Add(lhs, rhs, lhs.begin, rhs.end), rem2)
+    return Pair(Entity.Expr.Add(lhs, rhs, lhs.begin, rhs.end), rem3)
 }
 
 /** 整数リテラルのパーサ */
 @Throws(ParseException::class)
 suspend fun Flow<Token>.intLiteral(): Pair<Entity.Expr.IntLiteral, Flow<Token>> {
-    val token = try {
-        first()
+    val (token, rem) = try {
+        firstAndTail()
     } catch (e: NoSuchElementException) {
         throw ParseException(ParseExnReason.UnexpectedEOF("int"))
     }
@@ -50,5 +52,5 @@ suspend fun Flow<Token>.intLiteral(): Pair<Entity.Expr.IntLiteral, Flow<Token>> 
     if (token !is Token.IntToken)
         throw ParseException(ParseExnReason.UnexpectedToken("int", token))
 
-    return Pair(Entity.Expr.IntLiteral(token.raw, token.begin, token.end), drop(1))
+    return Pair(Entity.Expr.IntLiteral(token.raw, token.begin, token.end), rem)
 }
