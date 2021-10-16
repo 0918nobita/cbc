@@ -1,12 +1,15 @@
 package vision.kodai.cbc
 
-import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.count
+import kotlinx.coroutines.flow.drop
+import kotlinx.coroutines.flow.first
 
 /** 構文解析に失敗した原因 */
 sealed interface ParseExnReason {
     object UnexpectedNonEOF : ParseExnReason
-    data class UnexpectedToken(val expected: String, val actual: Token): ParseExnReason
-    data class UnexpectedEOF(val expected: String): ParseExnReason
+    data class UnexpectedToken(val expected: String, val actual: Token) : ParseExnReason
+    data class UnexpectedEOF(val expected: String) : ParseExnReason
 }
 
 /** 構文解析の失敗 */

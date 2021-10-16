@@ -1,6 +1,9 @@
+import org.jlleitschuh.gradle.ktlint.reporter.ReporterType
+
 plugins {
     application
     kotlin("jvm") version "1.5.31"
+    id("org.jlleitschuh.gradle.ktlint") version "10.2.0"
     id("org.jetbrains.dokka") version "1.5.30"
 }
 
@@ -10,6 +13,15 @@ application {
 
 tasks.test {
     useJUnitPlatform()
+}
+
+ktlint {
+    verbose.set(true)
+    outputToConsole.set(true)
+    coloredOutput.set(true)
+    reporters {
+        reporter(ReporterType.JSON)
+    }
 }
 
 repositories {

@@ -1,6 +1,9 @@
 package vision.kodai.cbc
 
-import com.github.michaelbull.result.*
+import com.github.michaelbull.result.Ok
+import com.github.michaelbull.result.Result
+import com.github.michaelbull.result.andThen
+import com.github.michaelbull.result.onFailure
 import vision.kodai.cbc.ast.Ast
 import vision.kodai.cbc.ast.Decls
 import kotlin.system.exitProcess
@@ -58,8 +61,8 @@ object Compiler {
 
     private fun build() =
         Options.sourceFiles
-            .fold(Unit) { _, src ->
-                compile(src)
+            .fold(Ok(Unit)) { _, src ->
+                return compile(src)
                     .andThen { assemble(src) }
             }
             .andThen { link() }
