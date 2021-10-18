@@ -5,9 +5,16 @@ import io.kotest.matchers.shouldBe
 import kotlinx.coroutines.flow.asFlow
 
 class ParserTest : StringSpec({
-    "parsing" {
+    "int literal" {
+        val src = "12"
+        val parseResult = src.toList().asFlow().lex().parse()
+        val expected = Entity.Expr.IntLiteral(12, Point(0, 0), Point(0, 1))
+        parseResult shouldBe expected
+    }
+
+    "addition" {
         val src = "3 + 4"
-        val program = src.toList().asFlow().lex().parse()
+        val parseResult = src.toList().asFlow().lex().parse()
         val expected =
             Entity.Expr.Add(
                 Entity.Expr.IntLiteral(3, Point(0, 0), Point(0, 0)),
@@ -15,6 +22,6 @@ class ParserTest : StringSpec({
                 Point(0, 0),
                 Point(0, 4)
             )
-        program shouldBe expected
+        parseResult shouldBe expected
     }
 })
