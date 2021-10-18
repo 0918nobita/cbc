@@ -31,7 +31,19 @@ fun Flow<Char>.lex(): Flow<Token> = flow {
                 c.isDigit() -> LexerState.CanReceiveAdditionalDigit(point, point, c.toString())
                 c.isWhitespace() -> LexerState.Initial
                 c == '+' -> {
-                    emit(Token.Plus(point, point))
+                    emit(Token.Plus(point))
+                    LexerState.Initial
+                }
+                c == '-' -> {
+                    emit(Token.Minus(point))
+                    LexerState.Initial
+                }
+                c == '*' -> {
+                    emit(Token.Times(point))
+                    LexerState.Initial
+                }
+                c == '/' -> {
+                    emit(Token.Div(point))
                     LexerState.Initial
                 }
                 else -> throw LexerException("Expected digit or whitespace")
