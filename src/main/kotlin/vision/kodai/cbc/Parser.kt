@@ -5,26 +5,9 @@ import kotlinx.coroutines.flow.count
 import kotlinx.coroutines.flow.drop
 import kotlinx.coroutines.flow.first
 
-suspend fun <T> Flow<T>.isEmpty() = count() == 0
-
 typealias TokenFlow = Flow<Token>
 
 typealias ParseResult<T> = Pair<T, TokenFlow>
-
-suspend fun TokenFlow.pickFirst(): ParseResult<Token> = Pair(first(), drop(1))
-
-fun <A1, A2> ParseResult<A1>.mapResult(f: (A1) -> A2): ParseResult<A2> =
-    Pair(f(first), second)
-
-suspend fun <A1, A2> ParseResult<A1>.chain(
-    f: suspend TokenFlow.(A1) -> ParseResult<A2>
-): ParseResult<A2> =
-    f(second, first)
-
-suspend fun <T> ParseResult<T>.chainOptional(
-    f: suspend TokenFlow.(T) -> ParseResult<T>
-): ParseResult<T> =
-    if (second.isEmpty()) { this } else { f(second, first) }
 
 /** 構文解析に失敗した原因 */
 sealed interface ParseExnReason {
@@ -37,32 +20,41 @@ sealed interface ParseExnReason {
 data class ParseException(val reason: ParseExnReason) : Exception()
 
 /** プログラム全体のパーサ */
-@Throws(ParseException::class)
 suspend fun TokenFlow.parse(): Entity.Expr<Int> {
-    val (expr, rem) = expr()
+    val (expr, rem) = term()
     if (rem.count() != 0) throw ParseException(ParseExnReason.UnexpectedNonEOF)
     return expr
 }
 
-/** 式のパーサ */
-@Throws(ParseException::class)
-suspend fun TokenFlow.expr(): ParseResult<Entity.Expr<Int>> =
-    intLiteral().chainOptional<Entity.Expr<Int>> { lhs ->
-        pickFirst().chain { op ->
-            if (op !is Token.Plus) throw ParseException(ParseExnReason.UnexpectedToken("+", op))
-            intLiteral().mapResult { rhs -> Entity.Expr.Add(lhs, rhs, lhs.begin, rhs.end) }
-        }
+/** 項のパーサ */
+suspend fun TokenFlow.term(): ParseResult<Entity.Expr<Int>> {
+    val res = intLiteral()
+    val (lhs, rem) = res
+
+    val op = try {
+        rem.first()
+    } catch (e: NoSuchElementException) {
+        return Pair(lhs, rem)
     }
 
+    return if (op is Token.Plus) {
+        val (rhs, rem2) = rem.drop(1).intLiteral()
+        Pair(Entity.Expr.Add(lhs, rhs), rem2)
+    } else {
+        res
+    }
+}
+
 /** 整数リテラルのパーサ */
-@Throws(ParseException::class)
-suspend fun TokenFlow.intLiteral(): ParseResult<Entity.Expr.IntLiteral> =
-    try {
-        pickFirst()
+suspend fun TokenFlow.intLiteral(): ParseResult<Entity.Expr.IntLiteral> {
+    val token = try {
+        first()
     } catch (e: NoSuchElementException) {
         throw ParseException(ParseExnReason.UnexpectedEOF("int"))
-    }.mapResult { token ->
-        if (token !is Token.IntToken)
-            throw ParseException(ParseExnReason.UnexpectedToken("int", token))
-        Entity.Expr.IntLiteral(token.raw, token.begin, token.end)
     }
+
+    if (token !is Token.IntToken)
+        throw ParseException(ParseExnReason.UnexpectedToken("int", token))
+
+    return Pair(Entity.Expr.IntLiteral(token.raw, token.begin, token.end), drop(1))
+}
