@@ -34,14 +34,19 @@ suspend fun TokenFlow.term(): ParseResult<Entity.Expr<Int>> {
     val op = try {
         rem.first()
     } catch (e: NoSuchElementException) {
-        return Pair(lhs, rem)
+        return res
     }
 
-    return if (op is Token.Plus) {
-        val (rhs, rem2) = rem.drop(1).intLiteral()
-        Pair(Entity.Expr.Add(lhs, rhs), rem2)
-    } else {
-        res
+    return when (op) {
+        is Token.Plus -> {
+            val (rhs, rem2) = rem.drop(1).intLiteral()
+            Pair(Entity.Expr.Add(lhs, rhs), rem2)
+        }
+        is Token.Minus -> {
+            val (rhs, rem2) = rem.drop(1).intLiteral()
+            Pair(Entity.Expr.Sub(lhs, rhs), rem2)
+        }
+        else -> res
     }
 }
 
